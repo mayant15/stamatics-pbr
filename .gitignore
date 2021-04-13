@@ -3,3 +3,5 @@ cmake-build-debug
 .vs
 .vscode
 build
+*.txt
+*.png
