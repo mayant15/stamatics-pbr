@@ -18,12 +18,13 @@
 // Math types
 ///////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////////
+// vvv CAN IGNORE
+
 struct Vec
 {
     double x, y, z;
 
-///////////////////////////////////////////////////////////////////////////////
-// vvv CAN IGNORE
 
     Vec(double x_, double y_, double z_) : x(x_), y(y_), z(z_) {}
     Vec(double scalar = 0.0) : Vec(scalar, scalar, scalar) {}
@@ -58,8 +59,6 @@ struct Vec
         return *this + b * (-1.);
     }
 
-// ^^^
-///////////////////////////////////////////////////////////////////////////////
 };
 
 /** Normalize the vector, return a unit vector in the same direction as the parameter. */
@@ -83,6 +82,9 @@ inline Vec cross(const Vec& a, const Vec& b)
         (a.x * b.y) - (a.y * b.x)
     };
 }
+
+// ^^^
+///////////////////////////////////////////////////////////////////////////////
 
 /** Structure that represents a ray in 3D. */
 struct Ray
