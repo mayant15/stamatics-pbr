@@ -4,4 +4,4 @@ cmake-build-debug
 .vscode
 build
 *.txt
-*.png
+!screenshots/*.png
