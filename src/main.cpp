@@ -21,10 +21,24 @@ const std::vector<Actor> SCENE = {
     Actor {
         Material {
             Colorf { 1.0, 0.1, 0.1 }, // Color
-            Colorf { 1.0, 0.0, 0.0 }  // Emission
+            Colorf { 0.0, 0.0, 0.0 },  // Emission
+            EMaterialType::DIFFUSE
         },
         SphereGeometry {
-            Vec { 0.0, 1.0, 0.0 },   // Position
+            Vec { 1.5, 1.0, 0.0 },   // Position
+            1.0                      // Radius
+        }
+    },
+
+    // Mirror
+    Actor {
+        Material {
+            Colorf { 1.0, 1.0, 1.0 }, // Color
+            Colorf { 0.0, 0.0, 0.0 },  // Emission
+            EMaterialType::SPECULAR
+        },
+        SphereGeometry {
+            Vec { -1.5, 1.0, 0.0 },   // Position
             1.0                      // Radius
         }
     },
@@ -33,7 +47,8 @@ const std::vector<Actor> SCENE = {
     Actor {
         Material {
             Colorf { 0.1, 1.0, 0.1 }, // Color
-            Colorf { 1.0, 0.0, 0.0 }  // Emission
+            Colorf { 0.0, 0.0, 0.0 },  // Emission
+            EMaterialType::DIFFUSE
         },
         SphereGeometry {
             Vec { 0.0, -1e5, 0.0 },  // Position
@@ -54,7 +69,7 @@ Colorf trace_ray(const Ray& ray, int depth)
 {
     if (depth >= PBR_MAX_RECURSION_DEPTH)
     {
-        return PBR_COLOR_BLACK;
+        return PBR_COLOR_SKYBLUE;
     }
 
     // Check if this ray intersects with anything in the scene
@@ -85,13 +100,45 @@ Colorf trace_ray(const Ray& ray, int depth)
     // Actual lighting calculations
     if (does_hit)
     {
-        Ray refl;
-        refl.direction = reflect(ray.direction, closest_hit.normal);
-        refl.origin = closest_hit.point;
+        // Simulates a discrete BRDF
 
-        // double diff = std::max(0., cosv(refl.direction, hit.normal));
-        // return hit.material.emission + hit.material.color;
-        return trace_ray(refl, depth + 1);
+        // TODO: Generate equidistant grid points for trapezoidal rule
+        Colorf result;
+        switch (closest_hit.material.type)
+        {
+        case EMaterialType::DIFFUSE:
+            {
+                double k = 10;
+                Vec d = reflect(ray.direction, closest_hit.normal);
+                d.x += ((double) std::rand() / RAND_MAX) * k;
+                d.y += ((double) std::rand() / RAND_MAX) * k;
+                d.z += ((double) std::rand() / RAND_MAX) * k;
+
+                Ray refl1;
+                refl1.direction = normalize(d);
+                refl1.origin = closest_hit.point;
+
+                double diff = clamp(cosv(refl1.direction, closest_hit.normal));
+
+                result = closest_hit.material.color * trace_ray(refl1, depth + 1) * diff;
+                break;
+            }
+
+        case EMaterialType::SPECULAR:
+            {
+                Ray refl2;
+                refl2.direction = reflect(ray.direction, closest_hit.normal);
+                refl2.origin = closest_hit.point;
+                result = trace_ray(refl2, depth + 1);
+                break;
+            }
+
+        default:
+            result = closest_hit.material.color;
+            break;
+        }
+
+        return result;
     }
     else
     {

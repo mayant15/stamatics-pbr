@@ -121,6 +121,11 @@ using Colori = uint32_t;
 ///////////////////////////////////////////////////////////////////////////////
 // vvv CAN IGNORE
 
+double clamp(double x, double min = 0, double max = 1)
+{
+    return (x < min) ? min : (x > max) ? max : x;
+}
+
 /*!
  * @brief Convert floating point color to integer color type.
  *
@@ -133,28 +138,34 @@ using Colori = uint32_t;
  */
 Colori to_colori(const Colorf& color)
 {
-    // Colorf should always be between 0 and 1
-    assert(color.x <= 1 && color.x >= 0);
-    assert(color.y <= 1 && color.y >= 0);
-    assert(color.z <= 1 && color.z >= 0);
-
-    // FIXME: Gamma correction
+    // Gamma correction
+    double gamma = 1 / 2.2;
+    double gx = std::pow(clamp(color.x), gamma);
+    double gy = std::pow(clamp(color.y), gamma);
+    double gz = std::pow(clamp(color.z), gamma);
 
     // Convert a valid Colorf to Colori
     return (255 << 24)
-    | ((int) std::floor(color.z * 255) << 16)
-    | ((int) std::floor(color.y * 255) << 8)
-    | (int) std::floor(color.x * 255);
+    | ((int) std::floor(gz * 255) << 16)
+    | ((int) std::floor(gy * 255) << 8)
+    | (int) std::floor(gx * 255);
 }
 
 // ^^^
 ///////////////////////////////////////////////////////////////////////////////
+
+enum class EMaterialType
+{
+    DIFFUSE,
+    SPECULAR
+};
 
 /** Structure that represents the surface material. Just a color for now. */
 struct Material
 {
     Colorf color;
     Colorf emission;
+    EMaterialType type;
 };
 
 /** Structure that represents a spherical object. */
