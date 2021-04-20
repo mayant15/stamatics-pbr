@@ -58,25 +58,46 @@ Colorf trace_ray(const Ray& ray, int depth)
     }
 
     // Check if this ray intersects with anything in the scene
-    // bool does_hit = false;
-    // HitResult closest_hit;
+    bool does_hit = false;
+    HitResult closest_hit;
     for (const auto& actor : SCENE)
     {
         HitResult hit;
         if (actor.intersect(ray, hit))
         {
-            Ray refl;
-            refl.direction = reflect(ray.direction, hit.normal);
-            refl.origin = hit.point;
-
-            // double diff = std::max(0., cosv(refl.direction, hit.normal));
-            // return hit.material.emission + hit.material.color;
-            return trace_ray(refl, depth + 1);
+            if (does_hit)
+            {
+                // Already hit something. Check if this one is closer.
+                if (hit.param < closest_hit.param)
+                {
+                    closest_hit = hit;
+                }
+            }
+            else
+            {
+                // First hit. Set closest_hit.
+                closest_hit = hit;
+                does_hit = true;
+            }
         }
     }
-    
-    // If there's no intersection, return a light blue color
-    return PBR_BACKGROUND_COLOR;
+
+    // Actual lighting calculations
+    if (does_hit)
+    {
+        Ray refl;
+        refl.direction = reflect(ray.direction, closest_hit.normal);
+        refl.origin = closest_hit.point;
+
+        // double diff = std::max(0., cosv(refl.direction, hit.normal));
+        // return hit.material.emission + hit.material.color;
+        return trace_ray(refl, depth + 1);
+    }
+    else
+    {
+        // If there's no intersection, return a light blue color
+        return PBR_BACKGROUND_COLOR;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -99,6 +120,7 @@ int main()
         std::vector<Colori> image (PBR_OUTPUT_IMAGE_ROWS * PBR_OUTPUT_IMAGE_COLUMNS);
 
         // Iterate over all rows
+        #pragma omp parallel for
         for (int row = 0; row < PBR_OUTPUT_IMAGE_ROWS; ++row)
         {
             std::cout << "Processing row " << row << std::endl;

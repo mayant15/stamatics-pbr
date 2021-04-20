@@ -204,6 +204,7 @@ struct SphereGeometry
 /** Information required from each intersection. */
 struct HitResult
 {
+    double param;
     Vec point;
     Vec normal;
     Material material;
@@ -227,6 +228,7 @@ struct Actor
         Vec point;
         if (geometry.intersect(ray, point))
         {
+            hit.param = (point - ray.origin).len() / ray.direction.len();
             hit.point = point;
             hit.material = material;
             hit.normal = normalize(hit.point - geometry.center);
