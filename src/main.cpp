@@ -20,7 +20,8 @@ const std::vector<Actor> SCENE = {
     // Red ball
     Actor {
         Material {
-            Colorf { 1.0, 0.0, 0.0 } // Color
+            Colorf { 1.0, 0.1, 0.1 }, // Color
+            Colorf { 1.0, 0.0, 0.0 }  // Emission
         },
         SphereGeometry {
             Vec { 0.0, 1.0, 0.0 },   // Position
@@ -31,7 +32,8 @@ const std::vector<Actor> SCENE = {
     // Floor
     Actor {
         Material {
-            Colorf { 0.0, 1.0, 0.0 } // Color
+            Colorf { 0.1, 1.0, 0.1 }, // Color
+            Colorf { 1.0, 0.0, 0.0 }  // Emission
         },
         SphereGeometry {
             Vec { 0.0, -1e5, 0.0 },  // Position
@@ -48,21 +50,33 @@ const std::vector<Actor> SCENE = {
  * @param ray Ray that's being traced
  * @return Colorf Output color
  */
-Colorf trace_ray(const Ray& ray)
+Colorf trace_ray(const Ray& ray, int depth)
 {
+    if (depth >= PBR_MAX_RECURSION_DEPTH)
+    {
+        return PBR_COLOR_BLACK;
+    }
+
     // Check if this ray intersects with anything in the scene
+    // bool does_hit = false;
+    // HitResult closest_hit;
     for (const auto& actor : SCENE)
     {
         HitResult hit;
         if (actor.intersect(ray, hit))
         {
-            // Just return the object's color for now
-            return hit.color;
+            Ray refl;
+            refl.direction = reflect(ray.direction, hit.normal);
+            refl.origin = hit.point;
+
+            // double diff = std::max(0., cosv(refl.direction, hit.normal));
+            // return hit.material.emission + hit.material.color;
+            return trace_ray(refl, depth + 1);
         }
     }
     
     // If there's no intersection, return a light blue color
-    return Colorf { 0.572, 0.886, 0.992 };
+    return PBR_BACKGROUND_COLOR;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -101,7 +115,7 @@ int main()
                 Ray ray = camera.get_ray(x, y);
 
                 // Trace the ray, find the color, write to the image vector
-                Colorf color = trace_ray(ray);
+                Colorf color = trace_ray(ray, 0);
                 image[row * PBR_OUTPUT_IMAGE_COLUMNS + col] = to_colori(color);
             }
         }

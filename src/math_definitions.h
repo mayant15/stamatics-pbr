@@ -44,6 +44,11 @@ struct Vec
         return { x * s, y * s, z * s };
     }
 
+    inline Vec operator*(const Vec& v) const
+    {
+        return { x * v.x, y * v.y, z * v.z };
+    }
+
     inline Vec operator/(double s) const
     {
         return *this * (1. / s);
@@ -73,6 +78,11 @@ inline double dot(const Vec& a, const Vec& b)
     return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
 }
 
+inline double cosv(const Vec& a, const Vec& b)
+{
+    return dot(normalize(a), normalize(b));
+}
+
 /** Calculate the cross product between a and b. */
 inline Vec cross(const Vec& a, const Vec& b)
 {
@@ -81,6 +91,11 @@ inline Vec cross(const Vec& a, const Vec& b)
         (a.z * b.x) - (a.x * b.z),
         (a.x * b.y) - (a.y * b.x)
     };
+}
+
+inline Vec reflect(const Vec& v, const Vec& n)
+{
+    return v - n * 2 * cosv(v, n) * v.len();
 }
 
 // ^^^
@@ -139,6 +154,7 @@ Colori to_colori(const Colorf& color)
 struct Material
 {
     Colorf color;
+    Colorf emission;
 };
 
 /** Structure that represents a spherical object. */
@@ -190,7 +206,7 @@ struct HitResult
 {
     Vec point;
     Vec normal;
-    Colorf color;
+    Material material;
 };
 
 /** An object that can be placed in the scene. Contains material and geometry for the object. */
@@ -212,7 +228,7 @@ struct Actor
         if (geometry.intersect(ray, point))
         {
             hit.point = point;
-            hit.color = material.color;
+            hit.material = material;
             hit.normal = normalize(hit.point - geometry.center);
             return true;
         }
