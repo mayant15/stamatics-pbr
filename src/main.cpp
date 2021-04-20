@@ -1,7 +1,7 @@
 #include "math_definitions.h"
 #include "camera.h"
 #include "stb_image_write.h"
-
+#include "config.h"
 #include <iostream>
 #include <vector>
 
@@ -69,9 +69,6 @@ Colorf trace_ray(const Ray& ray)
 // Configuration and implementation
 ///////////////////////////////////////////////////////////////////////////////
 
-#define COLS 1280
-#define ROWS 720
-
 int main()
 {
     // Wrap the entire thing in a try-catch to catch errors
@@ -81,31 +78,31 @@ int main()
         Camera camera;
         camera.position = Vec { 0, 2, 5 };
         camera.look_at = Vec { 0, 1, 0 }; // look at the red ball
-        camera.calculate_basis((double) COLS / ROWS); // Calculate u, v, w for the camera
+        camera.calculate_basis((double) PBR_OUTPUT_IMAGE_COLUMNS / PBR_OUTPUT_IMAGE_ROWS); // Calculate u, v, w for the camera
 
         // The image will have ROWS * COLS number of pixels, and each pixel will have
         // one Colori for it
-        std::vector<Colori> image (ROWS * COLS);
+        std::vector<Colori> image (PBR_OUTPUT_IMAGE_ROWS * PBR_OUTPUT_IMAGE_COLUMNS);
 
         // Iterate over all rows
-        for (int row = 0; row < ROWS; ++row)
+        for (int row = 0; row < PBR_OUTPUT_IMAGE_ROWS; ++row)
         {
             std::cout << "Processing row " << row << std::endl;
 
             // Iterates over all cols
-            for (int col = 0; col < COLS; ++col)
+            for (int col = 0; col < PBR_OUTPUT_IMAGE_COLUMNS; ++col)
             {
                 // Normalize (row, col) to (x, y) where x and y are between -1 and 1.
                 // Note that row = 0 col = 0 represents (-1, -1)
-                double x = (((double) col) / COLS) * 2 - 1;
-                double y = (((double) row) / ROWS) * 2 - 1;
+                double x = (((double) col) / PBR_OUTPUT_IMAGE_COLUMNS) * 2 - 1;
+                double y = (((double) row) / PBR_OUTPUT_IMAGE_ROWS) * 2 - 1;
                 
                 // Get the ray corresponding to (x, y)
                 Ray ray = camera.get_ray(x, y);
 
                 // Trace the ray, find the color, write to the image vector
                 Colorf color = trace_ray(ray);
-                image[row * COLS + col] = to_colori(color);
+                image[row * PBR_OUTPUT_IMAGE_COLUMNS + col] = to_colori(color);
             }
         }
 
@@ -114,7 +111,7 @@ int main()
         // The stb_image_write.h file has some documentation at the top for the library,
         // but we'll only ever need the following two lines.
         stbi_flip_vertically_on_write(true);
-        stbi_write_png("out.png", COLS, ROWS, 4, image.data(), COLS * sizeof (Colori));
+        stbi_write_png("out.png", PBR_OUTPUT_IMAGE_COLUMNS, PBR_OUTPUT_IMAGE_ROWS, 4, image.data(), PBR_OUTPUT_IMAGE_COLUMNS * sizeof (Colori));
 
         // Completed successfully! :)
         std::cout << "All ok!" << std::endl;

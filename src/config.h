@@ -1,0 +1,6 @@
+#pragma once
+
+#define PBR_OUTPUT_IMAGE_COLUMNS 1280
+#define PBR_OUTPUT_IMAGE_ROWS 720
+
+#define PBR_MAX_RECURSION_DEPTH 2

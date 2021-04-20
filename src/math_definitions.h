@@ -8,11 +8,11 @@
 // Constants and conversions
 ///////////////////////////////////////////////////////////////////////////////
 
-#define M_PI 3.1415926535897932384626433832795
-#define M_INF 1e20
-#define M_EPSILON 1e-4
+#define PBR_PI 3.1415926535897932384626433832795
+#define PBR_INF 1e20
+#define PBR_EPSILON 1e-4
 
-#define DEG_TO_RAD(DEG) (DEG * M_PI / 180)
+#define PBR_DEG_TO_RAD(DEG) (DEG * PBR_PI / 180)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Math types
@@ -149,8 +149,39 @@ struct SphereGeometry
 
     bool intersect(const Ray& ray, Vec& point) const
     {
-        // TODO: Calculate the point of intersection between a sphere and a ray
-        //   and assign the value to the `point` parameter
+        // For intersection, solve
+        // |(o + t*dir) - position| = radius
+        // (op + t * dir).(op + t * dir) = radius^2
+        // (dir.dir)t^2 + 2(op.dir)t + op.op - radius^2 = 0
+        // i.e solve At^2 + Bt + C = 0
+
+        Vec op = ray.origin - center;
+        double A = ray.direction.sqlen();
+        double B = 2 * dot(op, ray.direction);
+        double C = op.sqlen() - radius * radius;
+
+        double D = B * B - 4 * A * C;
+        if (D < 0) return false; // no solution
+        else D = std::sqrt(D);
+
+        double t1 = (-1 * B + D) / (2 * A);
+        double t2 = (-1 * B - D) / (2 * A);
+
+        // returns distance, 0 if nohit
+        if (t1 > PBR_EPSILON && t1 < t2)
+        {
+            point = ray.origin + ray.direction * t1;
+            return true;
+        }
+        else if (t2 > PBR_EPSILON)
+        {
+            point = ray.origin + ray.direction * t2;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 };
 
