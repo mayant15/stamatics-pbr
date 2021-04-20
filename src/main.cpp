@@ -108,11 +108,11 @@ Colorf trace_ray(const Ray& ray, int depth)
         {
         case EMaterialType::DIFFUSE:
             {
-                double k = 10;
+                double k = 500;
                 Vec d = reflect(ray.direction, closest_hit.normal);
-                d.x += ((double) std::rand() / RAND_MAX) * k;
-                d.y += ((double) std::rand() / RAND_MAX) * k;
-                d.z += ((double) std::rand() / RAND_MAX) * k;
+                d.x += ((double) std::rand() / RAND_MAX) * k - (k / 2);
+                d.y += ((double) std::rand() / RAND_MAX) * k - (k / 2);
+                d.z += ((double) std::rand() / RAND_MAX) * k - (k / 2);
 
                 Ray refl1;
                 refl1.direction = normalize(d);
