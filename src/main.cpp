@@ -2,154 +2,35 @@
 #include "camera.h"
 #include "stb_image_write.h"
 #include "config.h"
+#include "integrators.h"
+
 #include <iostream>
 #include <vector>
 
-///////////////////////////////////////////////////////////////////////////////
-// Scene description. Order is important here, because intersection test will
-// happen in that order.
-///////////////////////////////////////////////////////////////////////////////
-
-// NOTE: We assume the following conventions
-//   X-axis: Right
-//   Y-axis: Up
-//   Z-axis: Back
-// Note that X cross Y = Z, making this a right-handed system
-
-const std::vector<Actor> SCENE = {
-    // Red ball
-    Actor {
-        Material {
-            Colorf { 1.0, 0.1, 0.1 }, // Color
-            Colorf { 0.0, 0.0, 0.0 },  // Emission
-            EMaterialType::DIFFUSE
-        },
-        SphereGeometry {
-            Vec { 1.5, 1.0, 0.0 },   // Position
-            1.0                      // Radius
-        }
-    },
-
-    // Mirror
-    Actor {
-        Material {
-            Colorf { 1.0, 1.0, 1.0 }, // Color
-            Colorf { 0.0, 0.0, 0.0 },  // Emission
-            EMaterialType::SPECULAR
-        },
-        SphereGeometry {
-            Vec { -1.5, 1.0, 0.0 },   // Position
-            1.0                      // Radius
-        }
-    },
-
-    // Floor
-    Actor {
-        Material {
-            Colorf { 0.1, 1.0, 0.1 }, // Color
-            Colorf { 0.0, 0.0, 0.0 },  // Emission
-            EMaterialType::DIFFUSE
-        },
-        SphereGeometry {
-            Vec { 0.0, -1e5, 0.0 },  // Position
-            1e5                      // Radius
-        }
-    }
-};
-
 /*!
- * @brief Recursively trace the ray.
+ * @brief Convert floating point color to integer color type.
+ *
+ * Colorf has components between 0 and 1. Convert these components to integers between 0 and 255.
+ * Note that Colori is usually just used to write the final PNG image. Use Colorf for all other
+ * lighting calculations.
  * 
- * This function will be developed further, it is not even recursive for now.
- * 
- * @param ray Ray that's being traced
- * @return Colorf Output color
+ * @param color Color to convert to integer representation
+ * @return Colori 
  */
-Colorf trace_ray(const Ray& ray, int depth)
+Colori to_colori(const Colorf& color)
 {
-    if (depth >= PBR_MAX_RECURSION_DEPTH)
-    {
-        return PBR_COLOR_SKYBLUE;
-    }
+    // Gamma correction
+    double gamma = 1 / 2.2;
+    double gx = std::pow(clamp(color.x), gamma);
+    double gy = std::pow(clamp(color.y), gamma);
+    double gz = std::pow(clamp(color.z), gamma);
 
-    // Check if this ray intersects with anything in the scene
-    bool does_hit = false;
-    HitResult closest_hit;
-    for (const auto& actor : SCENE)
-    {
-        HitResult hit;
-        if (actor.intersect(ray, hit))
-        {
-            if (does_hit)
-            {
-                // Already hit something. Check if this one is closer.
-                if (hit.param < closest_hit.param)
-                {
-                    closest_hit = hit;
-                }
-            }
-            else
-            {
-                // First hit. Set closest_hit.
-                closest_hit = hit;
-                does_hit = true;
-            }
-        }
-    }
-
-    // Actual lighting calculations
-    if (does_hit)
-    {
-        // Simulates a discrete BRDF
-
-        // TODO: Generate equidistant grid points for trapezoidal rule
-        Colorf result;
-        switch (closest_hit.material.type)
-        {
-        case EMaterialType::DIFFUSE:
-            {
-                double k = 500;
-                Vec d = reflect(ray.direction, closest_hit.normal);
-                d.x += ((double) std::rand() / RAND_MAX) * k - (k / 2);
-                d.y += ((double) std::rand() / RAND_MAX) * k - (k / 2);
-                d.z += ((double) std::rand() / RAND_MAX) * k - (k / 2);
-
-                Ray refl1;
-                refl1.direction = normalize(d);
-                refl1.origin = closest_hit.point;
-
-                double diff = clamp(cosv(refl1.direction, closest_hit.normal));
-
-                result = closest_hit.material.color * trace_ray(refl1, depth + 1) * diff;
-                break;
-            }
-
-        case EMaterialType::SPECULAR:
-            {
-                Ray refl2;
-                refl2.direction = reflect(ray.direction, closest_hit.normal);
-                refl2.origin = closest_hit.point;
-                result = trace_ray(refl2, depth + 1);
-                break;
-            }
-
-        default:
-            result = closest_hit.material.color;
-            break;
-        }
-
-        return result;
-    }
-    else
-    {
-        // If there's no intersection, return a light blue color
-        return PBR_BACKGROUND_COLOR;
-    }
+    // Convert a valid Colorf to Colori
+    return (255 << 24)
+    | ((int) std::floor(gz * 255) << 16)
+    | ((int) std::floor(gy * 255) << 8)
+    | (int) std::floor(gx * 255);
 }
-
-///////////////////////////////////////////////////////////////////////////////
-// Configuration and implementation
-///////////////////////////////////////////////////////////////////////////////
 
 int main()
 {
@@ -161,6 +42,9 @@ int main()
         camera.position = Vec { 0, 2, 5 };
         camera.look_at = Vec { 0, 1, 0 }; // look at the red ball
         camera.calculate_basis((double) PBR_OUTPUT_IMAGE_COLUMNS / PBR_OUTPUT_IMAGE_ROWS); // Calculate u, v, w for the camera
+
+        Integrator<DiscreteBRDF> integrator;
+        integrator.set_scene(&PBR_SCENE_RTWEEKEND);
 
         // The image will have ROWS * COLS number of pixels, and each pixel will have
         // one Colori for it
@@ -184,7 +68,7 @@ int main()
                 Ray ray = camera.get_ray(x, y);
 
                 // Trace the ray, find the color, write to the image vector
-                Colorf color = trace_ray(ray, 0);
+                Colorf color = integrator.trace_ray(ray, 0);
                 image[row * PBR_OUTPUT_IMAGE_COLUMNS + col] = to_colori(color);
             }
         }
