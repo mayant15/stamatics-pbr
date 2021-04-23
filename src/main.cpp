@@ -39,24 +39,33 @@ int main()
     {
         // Setup the camera
         Camera camera;
-        camera.position = Vec { 0, 2, 5 };
-        camera.look_at = Vec { 0, 1, 0 }; // look at the red ball
-        camera.calculate_basis((double) PBR_OUTPUT_IMAGE_COLUMNS / PBR_OUTPUT_IMAGE_ROWS); // Calculate u, v, w for the camera
+        camera.position = PBR_CAMERA_POSITION;
+        camera.look_at = PBR_CAMERA_LOOKAT;
+        camera.fov = PBR_CAMERA_FOV_DEG;
+        camera.calculate_basis((double) PBR_OUTPUT_IMAGE_COLUMNS / PBR_OUTPUT_IMAGE_ROWS);
 
-        Integrator<DiscreteBRDF> integrator;
-        integrator.set_scene(&PBR_SCENE_RTWEEKEND);
+        // Setup the integrator. Notice the <DiscreteBRDF>. This is a template parameter.
+        // The aim is to implement all our BRDFs like this so that we can simply switch them
+        // out here and compare results.
+        Integrator<PBR_ACTIVE_SAMPLER_CLASS, PBR_ACTIVE_BRDF_CLASS> integrator;
+        integrator.set_scene(&PBR_ACTIVE_SCENE);
 
         // The image will have ROWS * COLS number of pixels, and each pixel will have
         // one Colori for it
         std::vector<Colori> image (PBR_OUTPUT_IMAGE_ROWS * PBR_OUTPUT_IMAGE_COLUMNS);
 
         // Iterate over all rows
+        // The #pragma is for using something called OpenMP, which will automatically run this
+        // loop in parallel on multiple threads. We can do this because rows are independent.
+        // Running them in parallel will give us a significant performance boost.
+#if PBR_USE_THREADS
         #pragma omp parallel for
+#endif
         for (int row = 0; row < PBR_OUTPUT_IMAGE_ROWS; ++row)
         {
             std::cout << "Processing row " << row << std::endl;
 
-            // Iterates over all cols
+            // Iterate over all cols
             for (int col = 0; col < PBR_OUTPUT_IMAGE_COLUMNS; ++col)
             {
                 // Normalize (row, col) to (x, y) where x and y are between -1 and 1.
@@ -78,7 +87,7 @@ int main()
         // The stb_image_write.h file has some documentation at the top for the library,
         // but we'll only ever need the following two lines.
         stbi_flip_vertically_on_write(true);
-        stbi_write_png("out.png", PBR_OUTPUT_IMAGE_COLUMNS, PBR_OUTPUT_IMAGE_ROWS, 4, image.data(), PBR_OUTPUT_IMAGE_COLUMNS * sizeof (Colori));
+        stbi_write_png(PBR_OUTPUT_IMAGE_NAME, PBR_OUTPUT_IMAGE_COLUMNS, PBR_OUTPUT_IMAGE_ROWS, 4, image.data(), PBR_OUTPUT_IMAGE_COLUMNS * sizeof (Colori));
 
         // Completed successfully! :)
         std::cout << "All ok!" << std::endl;

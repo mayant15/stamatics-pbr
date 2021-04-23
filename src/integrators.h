@@ -3,29 +3,18 @@
 #include "math_definitions.h"
 #include "config.h"
 
-#include <tuple>
-
-struct IntegratorTerm
+struct DiscreteSampler
 {
-    bool do_trace;
-    Colorf coeff;
-    Ray ray;
-
-    IntegratorTerm (bool dt, Colorf c, Ray r) : do_trace(dt), coeff(c), ray(r) {}
-};
-
-// Simulates a discrete BRDF
-struct DiscreteBRDF
-{
-    std::vector<IntegratorTerm> operator()(const Ray& incidence, const HitResult& hit) const
+    // NOTE: in is w.r.t. rays from the camera
+    std::vector<Ray> operator()(const Ray& in, const HitResult& hit) const
     {
-        std::vector<IntegratorTerm> result;
         switch (hit.material.type)
         {
             case EMaterialType::DIFFUSE:
             {
-                double k = 500;
-                Vec d = reflect(incidence.direction, hit.normal);
+                // Add a random offset between [-k/2, k/2] to each component
+                double k = PBR_DISCRETE_SAMPLER_DIFFUSE_OFFSET;
+                Vec d = reflect(in.direction, hit.normal);
                 d.x += ((double) std::rand() / RAND_MAX) * k - (k / 2);
                 d.y += ((double) std::rand() / RAND_MAX) * k - (k / 2);
                 d.z += ((double) std::rand() / RAND_MAX) * k - (k / 2);
@@ -33,40 +22,50 @@ struct DiscreteBRDF
                 Ray refl;
                 refl.direction = normalize(d);
                 refl.origin = hit.point;
+                return { refl };
+            }
+            
+            case EMaterialType::SPECULAR:
+            {
+                Ray refl;
+                refl.direction = reflect(in.direction, hit.normal);
+                refl.origin = hit.point;
+                return { refl };
+            }
+        
+            default:
+                // return a ray with zero-length direction if we don't want to trace the ray further
+                return { Ray {} };
+        }
+    }
+};
 
-                double diff = clamp(cosv(refl.direction, hit.normal));
-
-                result.emplace_back(true, hit.material.color * diff, refl);
-                break;
+// Simulates a discrete BRDF
+struct DiscreteBRDF
+{
+    // NOTE: in and out is w.r.t. rays from the camera
+    Colorf operator()(const Ray& in, const HitResult& hit, const Ray& out) const
+    {
+        switch (hit.material.type)
+        {
+            case EMaterialType::DIFFUSE:
+            {
+                double diff = clamp(cosv(out.direction, hit.normal));
+                return hit.material.color * diff;
             }
 
             case EMaterialType::SPECULAR:
             {
-                Ray refl;
-                refl.direction = reflect(incidence.direction, hit.normal);
-                refl.origin = hit.point;
-                result.emplace_back(true, Vec { 1.0 }, refl);
-                break;
+                return PBR_COLOR_WHITE;
             }
 
             default:
-                result.emplace_back(false, hit.material.color, Ray {});
-                break;
+                return hit.material.color;
         }
-
-        return result;
     }
 };
 
-// struct TrapezoidalBRDF
-// {
-//     std::vector<IntegratorTerm> operator()(const Ray& incidence, const HitResult& hit) const
-//     {
-//         // TODO: Generate equidistant grid points for trapezoidal rule
-//     }
-// };
-
-template <class BRDF>
+template <class Sampler, class BRDF>
 struct Integrator
 {
     void set_scene(const Scene* scene)
@@ -92,15 +91,19 @@ struct Integrator
         HitResult hit;
         if (intersect_scene(ray, hit))
         {
-            auto terms = brdf(ray, hit);
+            auto samples = sampler(ray, hit);
 
-            Colorf result;
-            for (const auto& term : terms)
+            Colorf result = Colorf { 0.0 };
+            for (const auto& sample_ray : samples)
             {
-                if (term.do_trace)
+                Colorf tr = Colorf { 1.0 };
+                if (sample_ray.direction.len() > PBR_EPSILON)
                 {
-                    result = result + term.coeff * trace_ray(term.ray, depth + 1);
+                    tr = trace_ray(sample_ray, depth + 1);
                 }
+
+                Colorf coeff = brdf(ray, hit, sample_ray);
+                result = result + coeff * tr;
             }
 
             return result;
@@ -115,8 +118,9 @@ struct Integrator
 private:
     const Scene* p_scene;
     BRDF brdf;
+    Sampler sampler;
 
-    bool intersect_scene(const Ray& ray, HitResult& out_hit)
+    bool intersect_scene(const Ray& ray, HitResult& out_hit) const
     {
         // Check if this ray intersects with anything in the scene
         bool does_hit = false;

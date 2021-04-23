@@ -79,6 +79,7 @@ inline double dot(const Vec& a, const Vec& b)
     return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
 }
 
+/** Calculate the cos of the angle between vectors a and b. */
 inline double cosv(const Vec& a, const Vec& b)
 {
     return dot(normalize(a), normalize(b));
@@ -94,13 +95,14 @@ inline Vec cross(const Vec& a, const Vec& b)
     };
 }
 
+// ^^^
+///////////////////////////////////////////////////////////////////////////////
+
+/** Reflect the incident vector v about a normal n. */
 inline Vec reflect(const Vec& v, const Vec& n)
 {
     return v - n * 2 * cosv(v, n) * v.len();
 }
-
-// ^^^
-///////////////////////////////////////////////////////////////////////////////
 
 /** Structure that represents a ray in 3D. */
 struct Ray
@@ -119,28 +121,29 @@ using Colorf = Vec;
 /** A 4-byte representation of color. R, G, B and A each are 1-byte integers (between 0 and 255). */
 using Colori = uint32_t;
 
-///////////////////////////////////////////////////////////////////////////////
-// vvv CAN IGNORE
-
+/** Clamp a value x between min and max. */
 inline double clamp(double x, double min = 0, double max = 1)
 {
     return (x < min) ? min : (x > max) ? max : x;
 }
 
-// ^^^
-///////////////////////////////////////////////////////////////////////////////
-
+/** Define the kind of reflection that the surface has. */
 enum class EMaterialType
 {
     DIFFUSE,
     SPECULAR
 };
 
-/** Structure that represents the surface material. Just a color for now. */
+/** Structure that represents the surface material. */
 struct Material
 {
+    /** Color of the surface */
     Colorf color;
+
+    /** Color of the light that this surface emits */
     Colorf emission;
+
+    /** Behaviour of the surface */
     EMaterialType type;
 };
 
@@ -228,6 +231,11 @@ struct Actor
     }
 };
 
+/** Scene alias for convenience. */
 using Scene = std::vector<Actor>;
+
+//// These are externs and defined in scene.cpp because we're going to pass pointers and such
+//// So I don't want this to be defined in each translation unit separately.
+
 extern Scene PBR_SCENE_RTWEEKEND;
 // extern Scene PBR_SCENE_CORNELL;

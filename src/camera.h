@@ -6,7 +6,7 @@
 struct Camera
 {
     /** Camera half field-of-view in degrees. */
-    double fov = 45;
+    double fov;
 
     /** Camera position. */
     Vec position;
@@ -29,6 +29,11 @@ struct Camera
         };
     }
 
+    /*!
+     * @brief Calculate a basis for the look at plane
+     * 
+     * @param aspect_ratio Aspect ratio for the camera's output image
+     */
     void calculate_basis(double aspect_ratio)
     {
         w = (look_at - position);
