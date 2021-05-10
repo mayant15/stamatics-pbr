@@ -24,6 +24,32 @@ Scene PBR_SCENE_RTWEEKEND = {
         }
     },
 
+    // Light 1
+    Actor {
+        Material {
+            Colorf { 0.0, 0.0, 0.0 }, // Color
+            Colorf { 8.0, 8.0, 8.0 },  // Emission
+            EMaterialType::DIFFUSE
+        },
+        SphereGeometry {
+            Vec { 6.0, 4.5, -4.0 },   // Position
+            3.0                      // Radius
+        }
+    },
+
+    // Light 2
+    Actor {
+        Material {
+            Colorf { 0.0, 0.0, 0.0 }, // Color
+            Colorf { 8.0, 8.0, 8.0 },  // Emission
+            EMaterialType::DIFFUSE
+        },
+        SphereGeometry {
+            Vec { -6.0, 4.5, -4.0 },   // Position
+            3.0                      // Radius
+        }
+    },
+
     // Mirror
     Actor {
         Material {

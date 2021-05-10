@@ -7,6 +7,8 @@
 
 #define PBR_DISCRETE_SAMPLER_DIFFUSE_OFFSET 50
 
+#define PBR_GRID_SAMPLER_SIZE 2
+
 #define PBR_ACTIVE_SAMPLER_CLASS DiscreteSampler
 #define PBR_ACTIVE_BRDF_CLASS    DiscreteBRDF
 
@@ -25,11 +27,12 @@
 #define PBR_COLOR_SKYBLUE Colorf { 0.572, 0.886, 0.992 }
 #define PBR_COLOR_BLACK   Colorf { 0.0, 0.0, 0.0 }
 #define PBR_COLOR_WHITE   Colorf { 1.0, 1.0, 1.0 }
+#define PBR_COLOR_GREY    Colorf { 0.2, 0.2, 0.2 }
 #define PBR_COLOR_RED     Colorf { 1.0, 0.0, 0.0 }
 #define PBR_COLOR_GREEN   Colorf { 0.0, 1.0, 0.0 }
 #define PBR_COLOR_BLUE    Colorf { 0.0, 0.0, 1.0 }
 
-#define PBR_BACKGROUND_COLOR PBR_COLOR_SKYBLUE
+#define PBR_BACKGROUND_COLOR PBR_COLOR_BLACK
 
 ///////////////////////////////////////////////////////////////////////////////
 // Output
