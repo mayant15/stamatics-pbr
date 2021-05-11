@@ -3,14 +3,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Renderer
 
-#define PBR_MAX_RECURSION_DEPTH 4
+#define PBR_MAX_RECURSION_DEPTH 2
 
 #define PBR_DISCRETE_SAMPLER_DIFFUSE_OFFSET 50
 
-#define PBR_GRID_SAMPLER_SIZE 2
+#define PBR_GRID_SAMPLER_SIZE 1
 
-#define PBR_ACTIVE_SAMPLER_CLASS DiscreteSampler
-#define PBR_ACTIVE_BRDF_CLASS    DiscreteBRDF
+#define PBR_ACTIVE_SAMPLER_CLASS GridSampler
+#define PBR_ACTIVE_BRDF_CLASS    DiffuseBRDF
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scene and camera
