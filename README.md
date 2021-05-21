@@ -1,25 +1,22 @@
 # Physically-Based Rendering
 
-A short course on pathtracing for Stamatics Projects '21
+A short course on pathtracing for Stamatics Projects '21.
 
-## Week 4
+## Week 5
 
-### Task: The `GridSampler`
+This week's task moves away from the core renderer.
 
-Remember that with the Forward Euler method we are trying to approximate the integral like this.
+### Task: Sampling a circle in 2D
 
-![fwd_euler.png](screenshots/fwd_euler.png)
+Implement the `sample_unit_circle()` function in `tools/sampler/sampler.h`. This function should return `n` points picked randomly from the unit circle. You can use the C++ standard library to generate random numbers.
 
-The n here is the number of divisions in the grid, given by `PBR_GRID_SAMPLER_SIZE`, and h is the side of a single grid element. The grid is centered at the hit point.
-
-Your task this week is to implement the `GridSampler` class to return an array of rays from the hit point to each element of the nxnxn grid.
+Here's the challenging part. Try to pick points spread *uniformly* across the circle. In the the naive implementation below, you can see that the center has a higher density of points than the boundary.
 
 ### Result
 
-The first result is with the `DiscreteSampler`, the second one is with the `GridSampler` with an 8x8x8 grid. Both have 2 bounces and use the `DiffuseBRDF`.
+One possible way to sample the unit circle could lead to samples like this. The `build/bin/sampler2d` executable generates this image to `build/bin/`.
 
-![out.png](screenshots/out.png)
-![grid.png](screenshots/grid.png)
+![sampler.png](screenshots/sampler.png)
 
 ## Build Instructions
 

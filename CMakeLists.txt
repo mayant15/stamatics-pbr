@@ -5,7 +5,10 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-add_executable(pbr src/main.cpp src/stb_image_write.cpp src/scene.cpp)
+include_directories(common)
+
+add_executable(pbr src/main.cpp common/stb_image_write.cpp src/scene.cpp)
+add_executable(sample2d tools/sampler/main.cpp common/stb_image_write.cpp)
 
 # OpenMP
 find_package(OpenMP)
