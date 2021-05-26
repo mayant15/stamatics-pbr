@@ -33,7 +33,7 @@ static void draw_around_pixel(Image& image, int row, int col)
 
 int main(void)
 {
-    constexpr size_t NUM_SAMPLER = 300;
+    constexpr size_t NUM_SAMPLER = 600;
     std::cout << "Sampling " << NUM_SAMPLER << " samples\n";
 
     Image image;
