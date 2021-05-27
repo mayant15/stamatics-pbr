@@ -9,7 +9,9 @@
 
 #define PBR_GRID_SAMPLER_SIZE 1
 
-#define PBR_ACTIVE_SAMPLER_CLASS GridSampler
+#define PBR_NUM_SAMPLES 8
+
+#define PBR_ACTIVE_SAMPLER_CLASS UniformSampler
 #define PBR_ACTIVE_BRDF_CLASS    DiffuseBRDF
 
 ///////////////////////////////////////////////////////////////////////////////

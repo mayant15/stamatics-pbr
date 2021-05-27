@@ -5,6 +5,13 @@
 
 #include <array>
 
+struct UniformSampler
+{
+    // TODO: Implement the uniform sampler to return PBR_NUM_SAMPLES number of directions
+    //   sampled uniformly over a 3D unit sphere. Also think about what the right weight
+    //   should be.
+};
+
 struct DiscreteSampler
 {
     const double weight = 1.0;
@@ -172,7 +179,7 @@ struct Integrator
     * @param ray Ray that's being traced
     * @return Colorf Output color
     */
-    Colorf trace_ray(const Ray& ray, int depth) const
+    Colorf trace_ray(const Ray& ray, int depth)
     {
         if (depth >= PBR_MAX_RECURSION_DEPTH)
         {

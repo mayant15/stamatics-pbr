@@ -2,21 +2,18 @@
 
 A short course on pathtracing for Stamatics Projects '21.
 
-## Week 5
+## Week 6
 
-This week's task moves away from the core renderer.
+### Task: The `UniformSampler`
 
-### Task: Sampling a circle in 2D
+This week we'll extend last week's 2D uniform sampler to 3D. Implement the `UniformSampler` to return directions uniformly sampled over a unit sphere.
 
-Implement the `sample_unit_circle()` function in `tools/sampler/sampler.h`. This function should return `n` points picked randomly from the unit circle. You can use the C++ standard library to generate random numbers.
-
-Here's the challenging part. Try to pick points spread *uniformly* across the circle. In the the naive implementation below, you can see that the center has a higher density of points than the boundary.
 
 ### Result
 
-One possible way to sample the unit circle could lead to samples like this. The `build/bin/sampler2d` executable generates this image to `build/bin/`.
+This output image was generated with the `UniformSampler` and `DiffuseBRDF`, with 2 bounces and 32 samples.
 
-![sampler.png](screenshots/sampler.png)
+![out.png](screenshots/out.png)
 
 ## Build Instructions
 

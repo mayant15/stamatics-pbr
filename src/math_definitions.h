@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cassert>
 #include <vector>
+#include <random>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constants and conversions
