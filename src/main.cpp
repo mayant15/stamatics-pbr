@@ -3,6 +3,7 @@
 #include "stb_image_write.h"
 #include "config.h"
 #include "integrators.h"
+#include "brdfs.h"
 
 #include <iostream>
 #include <vector>
@@ -47,7 +48,8 @@ int main()
         // Setup the integrator. Notice the <DiscreteBRDF>. This is a template parameter.
         // The aim is to implement all our BRDFs like this so that we can simply switch them
         // out here and compare results.
-        Integrator<PBR_ACTIVE_SAMPLER_CLASS, PBR_ACTIVE_BRDF_CLASS> integrator;
+        PathIntegrator<PBR_ACTIVE_BRDF_CLASS> integrator;
+        // Integrator<PBR_ACTIVE_SAMPLER_CLASS, PBR_ACTIVE_BRDF_CLASS> integrator;
         integrator.set_scene(&PBR_ACTIVE_SCENE);
 
         // The image will have ROWS * COLS number of pixels, and each pixel will have

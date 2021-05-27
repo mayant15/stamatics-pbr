@@ -12,7 +12,7 @@
 #define PBR_NUM_SAMPLES 8
 
 #define PBR_ACTIVE_SAMPLER_CLASS UniformSampler
-#define PBR_ACTIVE_BRDF_CLASS    DiffuseBRDF
+#define PBR_ACTIVE_BRDF_CLASS    path::DiffuseBRDF
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scene and camera
