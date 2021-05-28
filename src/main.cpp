@@ -8,16 +8,27 @@
 #include <iostream>
 #include <vector>
 
-/*!
- * @brief Convert floating point color to integer color type.
- *
- * Colorf has components between 0 and 1. Convert these components to integers between 0 and 255.
- * Note that Colori is usually just used to write the final PNG image. Use Colorf for all other
- * lighting calculations.
- * 
- * @param color Color to convert to integer representation
- * @return Colori 
- */
+std::vector<Point2D> sample_unit_circle()
+{
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dist(0.0, 1.0);
+
+    std::vector<Point2D> result = { Point2D { 0.0, 0.0} }; // Always sample the origin
+    for (int i = 0; i < PBR_SAMPLES_PER_PIXEL - 1; ++i) 
+    {
+        double u1 = dist(gen);
+        double u2 = dist(gen);
+
+        result.emplace_back(
+            std::sqrt(u1) * std::cos(2 * PBR_PI * u2),
+            std::sqrt(u1) * std::sin(2 * PBR_PI * u2)
+        );
+    }
+
+    return result;
+}
+
 Colori to_colori(const Colorf& color)
 {
     // Gamma correction
@@ -35,7 +46,6 @@ Colori to_colori(const Colorf& color)
 
 int main()
 {
-    // Wrap the entire thing in a try-catch to catch errors
     try
     {
         // Setup the camera
@@ -45,21 +55,14 @@ int main()
         camera.fov = PBR_CAMERA_FOV_DEG;
         camera.calculate_basis((double) PBR_OUTPUT_IMAGE_COLUMNS / PBR_OUTPUT_IMAGE_ROWS);
 
-        // Setup the integrator. Notice the <DiscreteBRDF>. This is a template parameter.
-        // The aim is to implement all our BRDFs like this so that we can simply switch them
-        // out here and compare results.
-        PathIntegrator<PBR_ACTIVE_BRDF_CLASS> integrator;
+
         // Integrator<PBR_ACTIVE_SAMPLER_CLASS, PBR_ACTIVE_BRDF_CLASS> integrator;
+        PathIntegrator<PBR_ACTIVE_BRDF_CLASS> integrator;
         integrator.set_scene(&PBR_ACTIVE_SCENE);
 
-        // The image will have ROWS * COLS number of pixels, and each pixel will have
-        // one Colori for it
         std::vector<Colori> image (PBR_OUTPUT_IMAGE_ROWS * PBR_OUTPUT_IMAGE_COLUMNS);
 
         // Iterate over all rows
-        // The #pragma is for using something called OpenMP, which will automatically run this
-        // loop in parallel on multiple threads. We can do this because rows are independent.
-        // Running them in parallel will give us a significant performance boost.
 #if PBR_USE_THREADS
         #pragma omp parallel for
 #endif
@@ -70,24 +73,23 @@ int main()
             // Iterate over all cols
             for (int col = 0; col < PBR_OUTPUT_IMAGE_COLUMNS; ++col)
             {
-                // Normalize (row, col) to (x, y) where x and y are between -1 and 1.
-                // Note that row = 0 col = 0 represents (-1, -1)
-                double x = (((double) col) / PBR_OUTPUT_IMAGE_COLUMNS) * 2 - 1;
-                double y = (((double) row) / PBR_OUTPUT_IMAGE_ROWS) * 2 - 1;
-                
-                // Get the ray corresponding to (x, y)
-                Ray ray = camera.get_ray(x, y);
+                auto spp = sample_unit_circle();
 
-                // Trace the ray, find the color, write to the image vector
-                Colorf color = integrator.trace_ray(ray, 0);
+                Colorf color;
+                for (const auto& s : spp)
+                {
+                    // Normalize (row + deviation, col + deviation) to (x, y) where x and y are between -1 and 1.
+                    double x = ((col + s.x) / PBR_OUTPUT_IMAGE_COLUMNS) * 2 - 1;
+                    double y = ((row + s.y) / PBR_OUTPUT_IMAGE_ROWS) * 2 - 1;
+                    Ray ray = camera.get_ray(x, y);
+                    color = color + integrator.trace_ray(ray, 0) / (PBR_SAMPLES_PER_PIXEL);
+                }
+
                 image[row * PBR_OUTPUT_IMAGE_COLUMNS + col] = to_colori(color);
             }
         }
 
-        // Use the stb library to write our calculated data to disk as a PNG file
-        // Flip the image first because top-left was (-1, -1) for us.
-        // The stb_image_write.h file has some documentation at the top for the library,
-        // but we'll only ever need the following two lines.
+        // Write to file
         stbi_flip_vertically_on_write(true);
         stbi_write_png(PBR_OUTPUT_IMAGE_NAME, PBR_OUTPUT_IMAGE_COLUMNS, PBR_OUTPUT_IMAGE_ROWS, 4, image.data(), PBR_OUTPUT_IMAGE_COLUMNS * sizeof (Colori));
 

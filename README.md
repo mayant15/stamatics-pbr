@@ -2,18 +2,20 @@
 
 A short course on pathtracing for Stamatics Projects '21.
 
-## Week 6
+## Week 7
 
-### Task: The `UniformSampler`
+### Task: Path tracing
 
 This week we'll extend last week's 2D uniform sampler to 3D. Implement the `UniformSampler` to return directions uniformly sampled over a unit sphere.
 
-
 ### Result
 
-This output image was generated with the `UniformSampler` and `DiffuseBRDF`, with 2 bounces and 32 samples.
+These images were generated with the `path::DiffuseBRDF` with samples-per-pixel 8, 128, 512 and 1024 respectively.
 
-![out.png](screenshots/out.png)
+![8](screenshots/out_8_spp.png)
+![128](screenshots/out_128_spp.png)
+![512](screenshots/out_512_spp.png)
+![1024](screenshots/out_1024_spp.png)
 
 ## Build Instructions
 
