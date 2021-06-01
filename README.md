@@ -13,7 +13,7 @@ The `week-*` branches have tasks and corresponding code created as part of the e
 ## Build Instructions
 
 **Requirements:**
-- C++ compiler
+- C++ compiler. The main branch requires C++17 but the weekly tasks are compatible with C++11
 - CMake (get this via `pip` and not `apt` if you're on Ubuntu)
 
 **Build:**

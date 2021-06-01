@@ -6,5 +6,6 @@
 #include <vector>
 #include <string>
 #include <random>
+#include <type_traits>
 
 #include <doctest.h>
