@@ -1,6 +1,8 @@
 #pragma once
 
 #include "math_definitions.h"
+#include "material.h"
+#include "scene.h"
 #include "config.h"
 #include <array>
 
@@ -31,7 +33,7 @@ namespace path
         virtual Colorf eval(const Ray& in, const HitResult& hit, const Ray& out)
         {
             // Returns hit.material.color by default
-            return hit.material.color;
+            return hit.material->color;
         }
 
         BaseBRDF() : dist(0.0, 1.0)
@@ -50,10 +52,29 @@ namespace path
         virtual Colorf eval(const Ray& in, const HitResult& hit, const Ray& out) override
         {
             double diff = clamp(cosv(out.direction, hit.normal));
-            return hit.material.color * diff;
+            return hit.material->color * diff;
+        }
+    };
+
+    struct SpecularBRDF : public BaseBRDF
+    {
+        virtual Ray sample(const Ray& in, const HitResult& hit) override
+        {
+            Ray refl;
+            refl.direction = reflect(in.direction, hit.normal);
+            refl.origin = hit.point;
+            return refl;
+        }
+
+        virtual Colorf eval(const Ray& in, const HitResult& hit, const Ray& out) override
+        {
+            return PBR_COLOR_WHITE;
         }
     };
 }
+
+
+#if 0
 
 namespace old
 {
@@ -244,5 +265,6 @@ namespace old
             }
         }
     };
-
 }
+
+#endif

@@ -1,4 +1,5 @@
-#include "math_definitions.h"
+#include "scene.h"
+#include "brdfs.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scene description.
@@ -13,11 +14,11 @@
 Scene PBR_SCENE_RTWEEKEND = {
     // Red ball
     Actor {
-        Material {
+        std::make_shared<Material>(
             Colorf { 1.0, 0.1, 0.1 }, // Color
             Colorf { 0.0, 0.0, 0.0 },  // Emission
-            EMaterialType::DIFFUSE
-        },
+            new path::DiffuseBRDF
+        ),
         SphereGeometry {
             Vec { 1.5, 1.0, 0.0 },   // Position
             1.0                      // Radius
@@ -26,11 +27,11 @@ Scene PBR_SCENE_RTWEEKEND = {
 
     // Light 1
     Actor {
-        Material {
-            Colorf { 0.0, 0.0, 0.0 }, // Color
+        std::make_shared<Material>(
+            Colorf { 1.0, 1.0, 1.0 }, // Color
             Colorf { 8.0, 8.0, 8.0 },  // Emission
-            EMaterialType::DIFFUSE
-        },
+            new path::DiffuseBRDF
+        ),
         SphereGeometry {
             Vec { 6.0, 4.5, -4.0 },   // Position
             3.0                      // Radius
@@ -39,11 +40,11 @@ Scene PBR_SCENE_RTWEEKEND = {
 
     // Light 2
     Actor {
-        Material {
-            Colorf { 0.0, 0.0, 0.0 }, // Color
+        std::make_shared<Material>(
+            Colorf { 1.0, 1.0, 1.0 }, // Color
             Colorf { 8.0, 8.0, 8.0 },  // Emission
-            EMaterialType::DIFFUSE
-        },
+            new path::DiffuseBRDF
+        ),
         SphereGeometry {
             Vec { -6.0, 4.5, -4.0 },   // Position
             3.0                      // Radius
@@ -52,11 +53,11 @@ Scene PBR_SCENE_RTWEEKEND = {
 
     // Mirror
     Actor {
-        Material {
+        std::make_shared<Material>(
             Colorf { 1.0, 1.0, 1.0 }, // Color
             Colorf { 0.0, 0.0, 0.0 },  // Emission
-            EMaterialType::SPECULAR
-        },
+            new path::SpecularBRDF
+        ),
         SphereGeometry {
             Vec { -1.5, 1.0, 0.0 },   // Position
             1.0                      // Radius
@@ -65,11 +66,11 @@ Scene PBR_SCENE_RTWEEKEND = {
 
     // Floor
     Actor {
-        Material {
+        std::make_shared<Material>(
             Colorf { 0.1, 1.0, 0.1 }, // Color
             Colorf { 0.0, 0.0, 0.0 },  // Emission
-            EMaterialType::DIFFUSE
-        },
+            new path::DiffuseBRDF
+        ),
         SphereGeometry {
             Vec { 0.0, -1e5, 0.0 },  // Position
             1e5                      // Radius

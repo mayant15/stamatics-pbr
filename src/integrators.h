@@ -1,9 +1,10 @@
 #pragma once
 
 #include "math_definitions.h"
+#include "brdfs.h"
+#include "scene.h"
 #include "config.h"
 
-template <class BRDF>
 struct PathIntegrator
 {
     void set_scene(const Scene* scene)
@@ -11,23 +12,24 @@ struct PathIntegrator
         p_scene = scene;
     }
 
+    // TODO: Convert the following recursive function into an iterative function
     Colorf trace_ray(const Ray& ray, int depth)
     {
-        if (depth >= PBR_MAX_RECURSION_DEPTH) return PBR_BACKGROUND_COLOR;
+        if (depth >= PBR_MAX_RECURSION_DEPTH) return PBR_COLOR_WHITE;
 
         HitResult hit;
         if (intersect_scene(ray, hit))
         {
-            Ray sampled_ray = brdf.sample(ray, hit);
-            Colorf coeff = brdf.eval(ray, hit, sampled_ray);
-            return hit.material.emission + coeff * trace_ray(sampled_ray, depth + 1);
+            auto& brdf = hit.material->brdf;
+            Ray sampled_ray = brdf->sample(ray, hit);
+            Colorf coeff = brdf->eval(ray, hit, sampled_ray);
+            return hit.material->emission + coeff * trace_ray(sampled_ray, depth + 1);
         }
         else return PBR_BACKGROUND_COLOR;
     }
 
 private:
     const Scene* p_scene;
-    BRDF brdf;
 
     bool intersect_scene(const Ray& ray, HitResult& out_hit) const
     {
@@ -57,6 +59,8 @@ private:
         return does_hit;
     }
 };
+
+#if 0
 
 template <class Sampler, class BRDF>
 struct Integrator
@@ -144,3 +148,5 @@ private:
         return does_hit;
     }
 };
+
+#endif

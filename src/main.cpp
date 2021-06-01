@@ -4,6 +4,7 @@
 #include "config.h"
 #include "integrators.h"
 #include "brdfs.h"
+#include "scene.h"
 
 #include <iostream>
 #include <vector>
@@ -55,9 +56,7 @@ int main()
         camera.fov = PBR_CAMERA_FOV_DEG;
         camera.calculate_basis((double) PBR_OUTPUT_IMAGE_COLUMNS / PBR_OUTPUT_IMAGE_ROWS);
 
-
-        // Integrator<PBR_ACTIVE_SAMPLER_CLASS, PBR_ACTIVE_BRDF_CLASS> integrator;
-        PathIntegrator<PBR_ACTIVE_BRDF_CLASS> integrator;
+        PathIntegrator integrator;
         integrator.set_scene(&PBR_ACTIVE_SCENE);
 
         std::vector<Colori> image (PBR_OUTPUT_IMAGE_ROWS * PBR_OUTPUT_IMAGE_COLUMNS);
@@ -73,6 +72,9 @@ int main()
             // Iterate over all cols
             for (int col = 0; col < PBR_OUTPUT_IMAGE_COLUMNS; ++col)
             {
+
+                // TODO: Implement stratified sampling here
+
                 auto spp = sample_unit_circle();
 
                 Colorf color;
