@@ -16,6 +16,7 @@ set(PBR_SOURCES
 
 add_executable(pbr ${PBR_SOURCES} src/main.cpp)
 add_executable(pbr-test ${PBR_SOURCES} common/doctest.cpp)
+target_compile_definitions(pbr-test PRIVATE PBR_BUILDING_TESTS)
 
 # OpenMP
 find_package(OpenMP)
