@@ -1,10 +1,6 @@
 #pragma once
 
-#include <cmath>
-#include <cstdint>
-#include <cassert>
-#include <vector>
-#include <random>
+#include "base.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constants and conversions
@@ -122,4 +118,14 @@ struct Ray
 inline double clamp(double x, double min = 0, double max = 1)
 {
     return (x < min) ? min : (x > max) ? max : x;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// TESTS
+///////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE("Testing inf")
+{
+    CHECK(PBR_INF == 1e20);
 }

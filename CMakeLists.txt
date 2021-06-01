@@ -5,13 +5,23 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-include_directories(common)
+include_directories(common src)
 
-add_executable(pbr src/main.cpp common/stb_image_write.cpp src/scene.cpp)
-add_executable(sample2d tools/sampler/main.cpp common/stb_image_write.cpp)
+set(PBR_SOURCES
+    common/stb_image_write.cpp
+
+    src/scene.cpp
+)
+
+add_executable(pbr ${PBR_SOURCES} src/main.cpp)
+add_executable(pbr-test ${PBR_SOURCES} common/doctest.cpp)
 
 # OpenMP
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
     target_link_libraries(pbr PUBLIC OpenMP::OpenMP_CXX)
+    target_link_libraries(pbr-test PUBLIC OpenMP::OpenMP_CXX)
 endif()
+
+# Other tools
+add_executable(sample2d tools/sampler/main.cpp common/stb_image_write.cpp)
