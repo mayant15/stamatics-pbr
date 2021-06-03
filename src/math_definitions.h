@@ -81,6 +81,11 @@ namespace pbr
         Direction direction;
     };
 
+    struct Basis
+    {
+        Vec u, v, w;
+    };
+
     /** Normalize the vector, return a unit vector in the same direction as the parameter. */
     // template <class Dims>
     inline auto normalize(const Vec& v)

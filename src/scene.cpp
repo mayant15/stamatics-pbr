@@ -30,7 +30,7 @@ namespace pbr
         Actor {
             std::make_shared<Material>(
                 Colorf { 1.0, 1.0, 1.0 }, // Color
-                Colorf { 8.0, 8.0, 8.0 },  // Emission
+                Colorf { 6.0, 6.0, 6.0 },  // Emission
                 new DiffuseBRDF
             ),
             SphereGeometry {
@@ -43,7 +43,7 @@ namespace pbr
         Actor {
             std::make_shared<Material>(
                 Colorf { 1.0, 1.0, 1.0 }, // Color
-                Colorf { 8.0, 8.0, 8.0 },  // Emission
+                Colorf { 6.0, 6.0, 6.0 },  // Emission
                 new DiffuseBRDF
             ),
             SphereGeometry {

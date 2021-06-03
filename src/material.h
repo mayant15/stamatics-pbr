@@ -3,6 +3,12 @@
 #include "radiometry.h"
 #include <memory>
 
+#define PBR_DECLARE_MATERIAL(NAME) \
+    struct NAME##BRDF : public BaseBRDF { \
+        virtual Ray sample(const Ray& in, const HitResult& hit) override; \
+        virtual Colorf eval(const Ray& in, const HitResult& hit, const Ray& out) override; \
+    };
+
 namespace pbr
 {
     struct HitResult;
@@ -14,27 +20,17 @@ namespace pbr
 
     struct BaseBRDF
     {
-        virtual Ray sample(const Ray& in, const HitResult& hit);
-        virtual Colorf eval(const Ray& in, const HitResult& hit, const Ray& out);
+        virtual Ray sample(const Ray& in, const HitResult& hit) = 0;
+        virtual Colorf eval(const Ray& in, const HitResult& hit, const Ray& out) = 0;
 
     protected:
         UniformRNG rng;
+        Basis get_basis(const HitResult& hit) const;
     };
 
-    /*!
-     * @brief Lambertian diffuse BRDF (constant)
-     * Sample: Uniform hemisphere
-     */
-    struct DiffuseBRDF : public BaseBRDF
-    {
-        virtual Colorf eval(const Ray& in, const HitResult& hit, const Ray& out) override;
-    };
-
-    struct SpecularBRDF : public BaseBRDF
-    {
-        virtual Ray sample(const Ray& in, const HitResult& hit) override;
-        virtual Colorf eval(const Ray& in, const HitResult& hit, const Ray& out) override;
-    };
+    /*! @brief Lambertian diffuse BRDF (constant) with cos-weighted hemisphere sampling */
+    PBR_DECLARE_MATERIAL(Diffuse);
+    PBR_DECLARE_MATERIAL(Specular);
 
     /** Structure that represents the surface material. */
     struct Material

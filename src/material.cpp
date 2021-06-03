@@ -4,17 +4,19 @@
 
 namespace pbr
 {
-    
-    Ray BaseBRDF::sample(const Ray& in, const HitResult& hit)
+    Basis BaseBRDF::get_basis(const HitResult& hit) const
     {
-        Vec s = rng.sample_hemisphere();
-
         Vec w = hit.normal;
         Vec u = normalize(cross(w, Vec { 0, 1, 0 }));
         Vec v = normalize(cross(u, w));
-        
-        Vec dir = normalize(u * s.x + v * s.y + w * s.z);
+        return { u, v, w };
+    }
 
+    Ray BaseBRDF::sample(const Ray& in, const HitResult& hit)
+    {
+        auto s = rng.sample_hemisphere();
+        auto b = get_basis(hit);
+        auto dir = normalize(b.u * s.x + b.v * s.y + b.w * s.z);
         return { hit.point, dir };
     }
 
@@ -24,10 +26,29 @@ namespace pbr
         return hit.actor->material->color;
     }
 
+    Ray DiffuseBRDF::sample(const Ray& in, const HitResult& hit)
+    {
+        // Cos-weighted sampling the hemisphere
+        double u1 = rng.sample();
+        double u2 = rng.sample();
+
+        double theta = std::acos(1 - 2 * u1) / 2;
+        double phi = 2 * PBR_PI * u2;
+
+        double x = std::sin(theta) * std::cos(phi);
+        double y = std::sin(theta) * std::sin(phi);
+        double z = std::cos(theta);
+
+        auto b = get_basis(hit);
+        auto dir = normalize(b.u * x + b.v * y + b.w * z);
+
+        return { hit.point, dir };
+    }
+
     Colorf DiffuseBRDF::eval(const Ray& in, const HitResult& hit, const Ray& out)
     {
-        double diff = clamp(cosv(out.direction, hit.normal));
-        return hit.actor->material->color * diff;
+        // Cos-weighted, so all coefficients have already be cancelled
+        return hit.actor->material->color;
     }
 
     Ray SpecularBRDF::sample(const Ray& in, const HitResult& hit)
