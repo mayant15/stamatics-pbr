@@ -12,6 +12,7 @@ set(PBR_SOURCES
 
     src/scene.cpp
     src/units.cpp
+    src/material.cpp
 )
 
 add_executable(pbr ${PBR_SOURCES} src/main.cpp)

@@ -10,7 +10,7 @@ namespace pbr::dims
         int Mass,
         int Current,
         int Temperature,
-        int Amount,
+        int Angle, // instead of Amount
         int LuminousIntensity
     >
     struct Dimensions
@@ -20,7 +20,7 @@ namespace pbr::dims
         static constexpr int mass = Mass;
         static constexpr int current = Current;
         static constexpr int temperature = Temperature;
-        static constexpr int amount = Amount;
+        static constexpr int angle = Angle;
         static constexpr int luminous_intensity = LuminousIntensity;
 
         template <class Other>
@@ -30,7 +30,7 @@ namespace pbr::dims
             mass + Other::mass,
             current + Other::current,
             temperature + Other::temperature,
-            amount + Other::amount,
+            angle + Other::angle,
             luminous_intensity + Other::luminous_intensity
         >;
 
@@ -41,7 +41,7 @@ namespace pbr::dims
             mass - Other::mass,
             current - Other::current,
             temperature - Other::temperature,
-            amount - Other::amount,
+            angle - Other::angle,
             luminous_intensity - Other::luminous_intensity
         >;
     };
@@ -53,7 +53,7 @@ namespace pbr::dims
     using Mass = Dimensions<0, 0, 1, 0, 0, 0, 0>;
     using Current = Dimensions<0, 0, 0, 1, 0, 0, 0>;
     using Temperature = Dimensions<0, 0, 0, 0, 1, 0, 0>;
-    using Amount = Dimensions<0, 0, 0, 0, 0, 1, 0>;
+    using Angle = Dimensions<0, 0, 0, 0, 0, 1, 0>;
     using LuminousIntensity = Dimensions<0, 0, 0, 0, 0, 0, 1>;
 
     // Derived dimensions
@@ -194,7 +194,14 @@ namespace pbr
         Number(double data = 0) : m_data(data) {}
     };
 
-    // Quantities using thode dimensions
+    // Quantities using those dimensions
+    using Scalar = Number<dims::Scalar>;
     using Length = Number<dims::Length>;
     using Time = Number<dims::Time>;
+    using Speed = Number<dims::Speed>;
+    using Acceleration = Number<dims::Speed::divide<dims::Time>>;
+    using Force = Number<dims::Mass::multiply<Acceleration::dimensions>>;
+    using Energy = Number<Force::dimensions::multiply<dims::Length>>;
+    using Power = Number<Energy::dimensions::divide<dims::Time>>;
+    using Intensity = Number<Power::dimensions::divide<dims::Area>>;
 }
