@@ -4,17 +4,15 @@ A short course on pathtracing for Stamatics Projects '21.
 
 ## Week 7
 
-### Task 1: Iterative path tracing
+The path-based formulation has been implemented, with paths being built incrementally. Sampling is now over a hemisphere since we're not really doing transparency right now, every material now has its own BRDF.
 
-We saw the new path-based formulation of the integral and the incremental construction of paths. `PathIntegrator::trace_ray()` implements a recursive algorithm for the same. The first task is to convert it to an iterative function.
-
-### Task 2: Stratified sampling for the camera
+### Task: Stratified sampling for the camera
 
 The current implementation samples camera rays uniformly from a circlular region inside the active pixel. Implement [stratified sampling](https://www.pbr-book.org/3ed-2018/Sampling_and_Reconstruction/Stratified_Sampling) which subdivides this pixel and selects samples uniformly within those subdivisions.
 
 ### Result
 
-These images were generated with 4 bounces and samples-per-pixel 16, 128, 512 and 1024 respectively. These results were with no stratified sampling and a recursive tracing function.
+These images were generated with 4 bounces and samples-per-pixel 16, 128, 512 and 1024 respectively. These results were with no stratified sampling.
 
 ![16](screenshots/out_16_spp.png)
 ![128](screenshots/out_128_spp.png)

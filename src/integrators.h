@@ -12,7 +12,6 @@ struct PathIntegrator
         p_scene = scene;
     }
 
-    // TODO: Convert the following recursive function into an iterative function
     Colorf trace_ray(const Ray& ray, int depth)
     {
         if (depth >= PBR_MAX_RECURSION_DEPTH) return PBR_COLOR_WHITE;

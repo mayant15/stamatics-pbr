@@ -5,3 +5,4 @@ cmake-build-debug
 build
 *.txt
 !screenshots/*.png
+out.png

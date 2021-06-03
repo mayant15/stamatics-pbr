@@ -13,20 +13,20 @@ namespace path
     {
         virtual Ray sample(const Ray& in, const HitResult& hit)
         {
-            // Samples uniformly by default
+            // Samples a hemisphere uniformly by default
             double u1 = dist(gen);
             double u2 = dist(gen);
 
-            double A = 2 * std::sqrt(u1 * (1 - u1));
+            double A = std::sqrt(1 - u1 * u1);
             double phi = 2 * PBR_PI * u2;
 
-            return { 
-                hit.point, /* origin */
-                Vec {      /* direction */
-                    A * std::cos(phi),
-                    A * std::sin(phi),
-                    1 - 2 * u1
-                }
+            Vec w = hit.normal;
+            Vec u = normalize(cross(w, Vec { 0, 1, 0 }));
+            Vec v = normalize(cross(u, w));
+
+            return {
+                hit.point,
+                normalize(u * A * std::cos(phi) + v * A * std::sin(phi) + w * u1)
             };
         }
 
@@ -47,12 +47,14 @@ namespace path
         std::uniform_real_distribution<> dist;
     };
 
+    /** Lambertian Diffuse BRDF */
     struct DiffuseBRDF : public BaseBRDF
     {
         virtual Colorf eval(const Ray& in, const HitResult& hit, const Ray& out) override
         {
-            double diff = clamp(cosv(out.direction, hit.normal));
-            return hit.material->color * diff;
+            // return normalize(out.direction);
+            auto diff = cosv(out.direction, hit.normal);
+            return hit.material->color * diff * 2; // 2pi for monte carlo, 1/pi for Lambertian BRDF
         }
     };
 
