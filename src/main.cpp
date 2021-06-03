@@ -1,12 +1,5 @@
-#include "math_definitions.h"
-#include "camera.h"
-#include "stb_image_write.h"
-#include "config.h"
-#include "integrators.h"
-#include "scene.h"
-
-#include <iostream>
-#include <vector>
+#include "pbr.h"
+#include <stb_image_write.h>
 
 void entry()
 {

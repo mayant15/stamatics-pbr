@@ -10,9 +10,9 @@ include_directories(common src)
 set(PBR_SOURCES
     common/stb_image_write.cpp
 
-    src/scene.cpp
-    src/units.cpp
-    src/material.cpp
+    src/core/units.cpp
+    src/scene/scene.cpp
+    src/materials/material.cpp
 )
 
 add_executable(pbr ${PBR_SOURCES} src/main.cpp)

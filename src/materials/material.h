@@ -1,7 +1,6 @@
 #pragma once
 
 #include "radiometry.h"
-#include <memory>
 
 #define PBR_DECLARE_MATERIAL(NAME) \
     struct NAME##BRDF : public BaseBRDF { \

@@ -1,6 +1,7 @@
 #include "material.h"
-#include "scene.h"
-#include "config.h"
+
+#include <scene/scene.h>
+#include <config.h>
 
 namespace pbr
 {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "math_definitions.h"
-#include "material.h"
+#include <core/math_definitions.h>
+#include <materials/material.h>
 
 namespace pbr
 {
