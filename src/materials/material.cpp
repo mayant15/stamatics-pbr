@@ -48,8 +48,30 @@ namespace pbr
 
     Colorf DiffuseBRDF::eval(const Ray& in, const HitResult& hit, const Ray& out)
     {
-        // Cos-weighted, so all coefficients have already be cancelled
-        return hit.actor->material->color;
+        // Cos-weighted, so cos/pi has already been cancelled
+        double roughness = hit.actor->material->roughness;
+        Colorf albedo = hit.actor->material->color;
+        if (roughness == 0)
+        {
+            // Return Lambertian diffuse
+            return albedo;
+        }
+
+        // Oren-Nayar model
+        //   https://en.wikipedia.org/wiki/Oren%E2%80%93Nayar_reflectance_model
+
+        auto [theta_in, phi_in] = to_polar_hemisphere(in.direction * -1, hit.normal);
+        auto [theta_out, phi_out] = to_polar_hemisphere(out.direction, hit.normal);
+
+        double alpha = std::max(theta_in, theta_out);
+        double beta = std::min(theta_in, theta_out);
+
+        double sq_rough = roughness * roughness;
+        double A = 1 - (0.5 * sq_rough) / (sq_rough + 0.33);
+        double B = (0.45 * sq_rough) / (sq_rough + 0.09);
+
+        B = B * std::max(0., std::cos(phi_in - phi_out)) * std::sin(alpha) * std::tan(beta);
+        return albedo * (A + B);
     }
 
     Ray SpecularBRDF::sample(const Ray& in, const HitResult& hit)

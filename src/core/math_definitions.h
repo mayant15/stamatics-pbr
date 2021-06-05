@@ -61,6 +61,11 @@ namespace pbr
         {
             return *this + b * (-1.);
         }
+
+        inline bool operator==(const BaseVec& other) const
+        {
+            return (x == other.x) && (y == other.y) && (z == other.z);
+        }
     };
 
     struct Point2D
@@ -132,6 +137,27 @@ namespace pbr
         return (x < min) ? min : (x > max) ? max : x;
     }
 
+    inline std::pair<double, double> to_polar_hemisphere(const Vec& direction, const Vec& zaxis)
+    {
+        // Generate basis for normal
+        Vec w = normalize(zaxis);
+        Vec u;
+        if (w == Vec { 0, 1, 0 })
+        {
+            u = Vec { 1, 0, 0 };
+        }
+        else
+        {
+            u = normalize(cross(w, Vec { 0, 1, 0 }));
+        }
+        Vec v = normalize(cross(w, u));
+
+        double theta = std::acos(cosv(direction, zaxis)); // component on w
+        double phi = std::acos(dot(u, direction) / std::sin(theta)); // component on u
+
+        return { theta, phi };
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     // Random
     ///////////////////////////////////////////////////////////////////////////////
@@ -188,5 +214,24 @@ namespace pbr
     TEST_CASE("Testing inf")
     {
         CHECK(PBR_INF == 1e20);
+    }
+
+    TEST_CASE("math::to_polar_hemisphere")
+    {
+        Vec normal { 0., 1., 0. };
+        Vec dir { 1., 1., 1. };
+        dir = normalize(dir);
+
+        auto [theta, phi] = to_polar_hemisphere(dir, normal);
+        CHECK(std::sin(theta) == doctest::Approx(std::sqrt(2) / std::sqrt(3)));
+        CHECK(phi == doctest::Approx(PBR_PI / 4.));
+
+        Vec normal2 { 0., 0., -1. };
+        Vec dir2 { 1., 1., -1. };
+        dir2 = normalize(dir2);
+
+        auto [theta2, phi2] = to_polar_hemisphere(dir2, normal2);
+        CHECK(std::sin(theta2) == doctest::Approx(std::sqrt(2) / std::sqrt(3)));
+        CHECK(phi2 == doctest::Approx(PBR_PI / 4.));
     }
 }

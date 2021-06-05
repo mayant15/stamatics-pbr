@@ -8,6 +8,7 @@
 #include <string>
 #include <random>
 #include <memory>
+#include <utility>
 #include <type_traits>
 
 #ifndef PBR_BUILDING_TESTS

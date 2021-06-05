@@ -98,7 +98,8 @@ namespace pbr
             std::make_shared<Material>(
                 Colorf { 1.0, 0.0, 0.0 }, // Color
                 Colorf { 0.0, 0.0, 0.0 },  // Emission
-                new DiffuseBRDF
+                new DiffuseBRDF,
+                0.3
             ),
             SphereGeometry {
                 Vec { 1.5, 1.0, 0.0 },   // Position

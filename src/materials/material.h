@@ -43,8 +43,10 @@ namespace pbr
         /** Behaviour of the surface */
         BaseBRDF* brdf;
 
-        Material(Colorf color_, Colorf emission_, BaseBRDF* brdf_)
-            : color(color_), emission(emission_), brdf(brdf_) {}
+        double roughness;
+
+        Material(Colorf color_, Colorf emission_, BaseBRDF* brdf_, double roughness_ = 0.0)
+            : color(color_), emission(emission_), brdf(brdf_), roughness(roughness_) {}
 
         ~Material() { delete brdf; }
     };
