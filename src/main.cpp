@@ -36,9 +36,16 @@ void entry()
             {
                 auto sample = rng.sample_disk();
 
+                // Split the pixel into four quadrants for stratified sampling
+                // Modulo operations to choose these quadrants
+                double center_x = (1. / 2.) * ((i % 2) * 2 - 1);
+                double center_y = (1. / 2.) * (((i % 4) < 2) ? 1 : -1);
+                double deviation_x = sample.x / 2.;
+                double deviation_y = sample.y / 2.;
+
                 // Normalize (row + deviation, col + deviation) to (x, y) where x and y are between -1 and 1.
-                double x = ((col + sample.x) / PBR_OUTPUT_IMAGE_COLUMNS) * 2 - 1;
-                double y = ((row + sample.y) / PBR_OUTPUT_IMAGE_ROWS) * 2 - 1;
+                double x = ((col + center_x + deviation_x) / PBR_OUTPUT_IMAGE_COLUMNS) * 2 - 1;
+                double y = ((row + center_y + deviation_y) / PBR_OUTPUT_IMAGE_ROWS) * 2 - 1;
                 Ray ray = camera.get_ray(x, y);
                 color = color + integrator.trace_ray(ray, 0) / (PBR_SAMPLES_PER_PIXEL);
             }
