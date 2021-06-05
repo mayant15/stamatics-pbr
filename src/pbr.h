@@ -13,3 +13,5 @@
 #include "scene/scene.h"
 
 #include "integrators/PathIntegrator.h"
+
+#include "renderer.h"

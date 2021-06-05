@@ -5,7 +5,10 @@
 
 #define PBR_MAX_RECURSION_DEPTH 4
 
-#define PBR_SAMPLES_PER_PIXEL 8
+#define PBR_SAMPLES_PER_PIXEL 32
+
+#define PBR_STRATIFIED_SAMPLE 1
+#define PBR_VERBOSE_OUTPUT 1
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scene and camera
