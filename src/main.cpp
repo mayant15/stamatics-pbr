@@ -1,4 +1,5 @@
 #include "pbr.h"
+#include "debug.h"
 
 void entry()
 {
@@ -22,8 +23,7 @@ void entry()
     image.write(PBR_OUTPUT_IMAGE_NAME);
 
     // Completed successfully! :)
-    std::cout << "All ok!" << std::endl;
-
+    LOG_INFO("All ok!");
 }
 
 int main()

@@ -4,6 +4,7 @@
 #include "materials/radiometry.h"
 #include "scene/camera.h"
 #include "config.h"
+#include "debug.h"
 
 namespace pbr
 {
@@ -52,9 +53,7 @@ namespace pbr
             for (int row = 0; row < outImage.rows(); ++row)
             {
 
-#if PBR_VERBOSE_OUTPUT
-                std::cout << "Processing row " << row << std::endl;
-#endif
+                LOG_DEBUG("Row %d", row);
 
                 // Iterate over all cols
                 for (int col = 0; col < outImage.cols(); ++col)

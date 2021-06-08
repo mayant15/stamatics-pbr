@@ -3,11 +3,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Renderer
 
-#define PBR_MAX_RECURSION_DEPTH 16
-#define PBR_SAMPLES_PER_PIXEL 1
+#define PBR_MAX_RECURSION_DEPTH 4
+#define PBR_SAMPLES_PER_PIXEL 8
 
 #define PBR_STRATIFIED_SAMPLE 1
-#define PBR_VERBOSE_OUTPUT 1
+#define PBR_DEBUG_LEVEL 1
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scene and camera
