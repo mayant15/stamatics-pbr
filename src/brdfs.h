@@ -11,7 +11,7 @@ namespace path
     // NOTE: in is w.r.t. rays from the camera
     struct BaseBRDF
     {
-        virtual Ray sample(const Ray& in, const HitResult& hit)
+        virtual Ray sample(const Ray &in, const HitResult &hit)
         {
             // Samples a hemisphere uniformly by default
             double u1 = dist(gen);
@@ -21,16 +21,15 @@ namespace path
             double phi = 2 * PBR_PI * u2;
 
             Vec w = hit.normal;
-            Vec u = normalize(cross(w, Vec { 0, 1, 0 }));
+            Vec u = normalize(cross(w, Vec{0, 1, 0}));
             Vec v = normalize(cross(u, w));
 
             return {
                 hit.point,
-                normalize(u * A * std::cos(phi) + v * A * std::sin(phi) + w * u1)
-            };
+                normalize(u * A * std::cos(phi) + v * A * std::sin(phi) + w * u1)};
         }
 
-        virtual Colorf eval(const Ray& in, const HitResult& hit, const Ray& out)
+        virtual Colorf eval(const Ray &in, const HitResult &hit, const Ray &out)
         {
             // Returns hit.material.color by default
             return hit.material->color;
@@ -50,7 +49,7 @@ namespace path
     /** Lambertian Diffuse BRDF */
     struct DiffuseBRDF : public BaseBRDF
     {
-        virtual Colorf eval(const Ray& in, const HitResult& hit, const Ray& out) override
+        virtual Colorf eval(const Ray &in, const HitResult &hit, const Ray &out) override
         {
             // return normalize(out.direction);
             auto diff = cosv(out.direction, hit.normal);
@@ -60,7 +59,7 @@ namespace path
 
     struct SpecularBRDF : public BaseBRDF
     {
-        virtual Ray sample(const Ray& in, const HitResult& hit) override
+        virtual Ray sample(const Ray &in, const HitResult &hit) override
         {
             Ray refl;
             refl.direction = reflect(in.direction, hit.normal);
@@ -68,13 +67,72 @@ namespace path
             return refl;
         }
 
-        virtual Colorf eval(const Ray& in, const HitResult& hit, const Ray& out) override
+        virtual Colorf eval(const Ray &in, const HitResult &hit, const Ray &out) override
         {
             return PBR_COLOR_WHITE;
         }
     };
-}
 
+    /** Oren Nayer BRDF */
+    struct OrenNayarBRDF : public BaseBRDF
+    {
+        virtual Colorf eval(const Ray &in, const HitResult &hit, const Ray &out) override
+        {
+            // in ==>  camera to point
+            // out ==> point to light
+
+            // Roughness calculations
+            double sigma = 0.75;
+            double A = 1.0 - (0.5 * ((sigma * sigma) / ((sigma * sigma) + 0.33)));
+            double B = 0.45 * ((sigma * sigma) / ((sigma * sigma) + 0.09));
+
+            // Angle Calculations
+            /*
+            double thetaI = pbr_angle(out.direction, hit.normal);
+            double thetaO = pbr_angle(in.direction, hit.normal);
+            double alpha = pbr_max(thetaI, thetaO);
+            double beta = pbr_min(thetaI, thetaO);
+            Vec cos_values;
+            cos_values.x = clamp(dot(hit.normal, out.direction));
+            cos_values.y = clamp(dot(hit.normal, in.direction));
+            Vec out_plane = normalize(out.direction - hit.normal * cos_values.x);
+            Vec in_plane = normalize(in.direction - hit.normal * cos_values.y);
+            float cos_val = clamp(dot(out_plane, in_plane));
+            auto diff = cosv(out.direction, hit.normal) * (A + (B * cos_val * sin(alpha) * tan(beta)));
+            */
+
+            // Simplified Implementation
+            Vec N = hit.normal;
+            double L = clamp(dot(out.direction, N));
+            double V = clamp(dot(in.direction, N));
+            double D = sqrt(1 - (L * L)) * sqrt(1 - (V * V)) / pbr_max(L, V);
+            Vec out_plane = normalize(out.direction - N * L);
+            Vec in_plane = normalize(in.direction - N * V);
+            double C = clamp(dot(out_plane, in_plane));
+            auto diff = cosv(out.direction, hit.normal) * (A + (B * C * D));
+
+            return hit.material->color * diff * 2; // 2pi for monte carlo, 1/pi for Lambertian BRDF
+        }
+    };
+
+    struct PhongBRDF : public BaseBRDF
+    {
+        virtual Colorf eval(const Ray &in, const HitResult &hit, const Ray &out) override
+        {
+            const double kD = 0.95;
+            const double kS = 1 - kD;
+            const double shininess = 32;
+
+            auto diff = clamp(cosv(out.direction, hit.normal));
+            auto spec = std::pow(
+                clamp(dot(
+                    normalize(reflect(out.direction * -1, hit.normal)),
+                    normalize(in.direction * -1))),
+                shininess);
+            return hit.material->color * (kD * diff + kS * spec) * 2; // 2pi for monte carlo, 1/pi for Lambertian BRDF
+        }
+    };
+}
 
 #if 0
 

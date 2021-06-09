@@ -33,7 +33,6 @@ struct Vec
 {
     double x, y, z;
 
-
     Vec(double x_, double y_, double z_) : x(x_), y(y_), z(z_) {}
     Vec(double scalar = 0.0) : Vec(scalar, scalar, scalar) {}
 
@@ -49,12 +48,12 @@ struct Vec
 
     inline Vec operator*(double s) const
     {
-        return { x * s, y * s, z * s };
+        return {x * s, y * s, z * s};
     }
 
-    inline Vec operator*(const Vec& v) const
+    inline Vec operator*(const Vec &v) const
     {
-        return { x * v.x, y * v.y, z * v.z };
+        return {x * v.x, y * v.y, z * v.z};
     }
 
     inline Vec operator/(double s) const
@@ -62,51 +61,49 @@ struct Vec
         return *this * (1. / s);
     }
 
-    inline Vec operator+(const Vec& b) const
+    inline Vec operator+(const Vec &b) const
     {
         return {x + b.x, y + b.y, z + b.z};
     }
 
-    inline Vec operator-(const Vec& b) const
+    inline Vec operator-(const Vec &b) const
     {
         return *this + b * (-1.);
     }
-
 };
 
 /** Normalize the vector, return a unit vector in the same direction as the parameter. */
-inline Vec normalize(const Vec& v)
+inline Vec normalize(const Vec &v)
 {
     return v / v.len();
 }
 
 /** Calculate the dot product between vectors a and b. */
-inline double dot(const Vec& a, const Vec& b)
+inline double dot(const Vec &a, const Vec &b)
 {
     return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
 }
 
 /** Calculate the cos of the angle between vectors a and b. */
-inline double cosv(const Vec& a, const Vec& b)
+inline double cosv(const Vec &a, const Vec &b)
 {
     return dot(normalize(a), normalize(b));
 }
 
 /** Calculate the cross product between a and b. */
-inline Vec cross(const Vec& a, const Vec& b)
+inline Vec cross(const Vec &a, const Vec &b)
 {
-    return { 
+    return {
         (a.y * b.z) - (a.z * b.y),
         (a.z * b.x) - (a.x * b.z),
-        (a.x * b.y) - (a.y * b.x)
-    };
+        (a.x * b.y) - (a.y * b.x)};
 }
 
 // ^^^
 ///////////////////////////////////////////////////////////////////////////////
 
 /** Reflect the incident vector v about a normal n. */
-inline Vec reflect(const Vec& v, const Vec& n)
+inline Vec reflect(const Vec &v, const Vec &n)
 {
     return v - n * 2 * cosv(v, n) * v.len();
 }
@@ -121,5 +118,22 @@ struct Ray
 /** Clamp a value x between min and max. */
 inline double clamp(double x, double min = 0, double max = 1)
 {
-    return (x < min) ? min : (x > max) ? max : x;
+    return (x < min) ? min : (x > max) ? max
+                                       : x;
+}
+
+inline double pbr_max(double x, double y)
+{
+    return (x > y) ? x : y;
+}
+
+inline double pbr_min(double x, double y)
+{
+    return (x > y) ? y : x;
+}
+
+inline double pbr_angle(const Vec &a, const Vec &b)
+{
+    double cosvalue = dot(a, b) / (a.len() * b.len());
+    return acos(cosvalue);
 }

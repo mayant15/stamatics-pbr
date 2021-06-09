@@ -9,7 +9,7 @@ struct SphereGeometry
     Vec center;
     float radius;
 
-    bool intersect(const Ray& ray, Vec& point) const
+    bool intersect(const Ray &ray, Vec &point) const
     {
         // For intersection, solve
         // |(o + t*dir) - position| = radius
@@ -23,8 +23,10 @@ struct SphereGeometry
         double C = op.sqlen() - radius * radius;
 
         double D = B * B - 4 * A * C;
-        if (D < 0) return false; // no solution
-        else D = std::sqrt(D);
+        if (D < 0)
+            return false; // no solution
+        else
+            D = std::sqrt(D);
 
         double t1 = (-1 * B + D) / (2 * A);
         double t2 = (-1 * B - D) / (2 * A);
@@ -69,7 +71,7 @@ struct Actor
      * @param hit Output hit data
      * @return bool Indicates if the ray intersects with this actor
      */
-    bool intersect(const Ray& ray, HitResult& hit) const
+    bool intersect(const Ray &ray, HitResult &hit) const
     {
         Vec point;
         if (geometry.intersect(ray, point))
@@ -94,4 +96,5 @@ using Scene = std::vector<Actor>;
 //// So I don't want this to be defined in each translation unit separately.
 
 extern Scene PBR_SCENE_RTWEEKEND;
+extern Scene PBR_SCENE_FINAL_ON;
 // extern Scene PBR_SCENE_CORNELL;
