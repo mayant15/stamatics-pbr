@@ -73,6 +73,33 @@ namespace path
             return PBR_COLOR_WHITE;
         }
     };
+    
+    struct OrenNayar : public BaseBRDF
+    {
+        public:
+        double sigma,A,B;
+
+        OrenNayar(double sig=0.5): sigma(sig){
+            double sig_sq = pow(sigma,2);
+            A = 1 - sig_sq/(2*(0.33 + sig_sq));
+            B = 0.45 * sig_sq / (0.09 + sig_sq);
+        }
+
+        virtual Colorf eval(const Ray& in, const HitResult& hit, const Ray& out) override
+        {
+            double theta_o = acos( clamp(dot(hit.normal,out.direction),-1.0,1.0));
+            double theta_i = acos( clamp(dot(hit.normal,in.direction*-1.0),-1.0,1.0));
+            double alpha = (theta_o > theta_i) ? theta_o : theta_i;
+            double beta = (theta_o > theta_i) ? theta_i : theta_o;
+            Vec out_projection = out.direction - hit.normal*(cosv(hit.normal,out.direction));
+            Vec in_projection = in.direction + hit.normal*(cosv(hit.normal,in.direction*-1.0));
+            double cos_term = cosv(out_projection,in_projection);
+            double ans = cosv(out.direction,hit.normal) * (A + B*cos_term*sin(alpha)*tan(beta));
+
+            return hit.material->color * ans * 2;
+        }
+    };
+
 }
 
 
