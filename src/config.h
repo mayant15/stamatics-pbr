@@ -3,9 +3,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Renderer
 
-#define PBR_MAX_RECURSION_DEPTH 4
+#define PBR_MAX_RECURSION_DEPTH 3
 
-#define PBR_SAMPLES_PER_PIXEL 16
+#define PBR_SAMPLES_PER_PIXEL 512
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scene and camera
@@ -13,7 +13,7 @@
 #define PBR_ACTIVE_SCENE PBR_SCENE_RTWEEKEND
 
 #define PBR_CAMERA_LOOKAT   Vec { 0, 1, 0 }
-#define PBR_CAMERA_POSITION Vec { 0, 2, 5 }
+#define PBR_CAMERA_POSITION Vec { 2, 2, 5 }
 #define PBR_CAMERA_FOV_DEG  45
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -27,7 +27,7 @@
 #define PBR_COLOR_GREEN   Colorf { 0.0, 1.0, 0.0 }
 #define PBR_COLOR_BLUE    Colorf { 0.0, 0.0, 1.0 }
 
-#define PBR_BACKGROUND_COLOR PBR_COLOR_BLACK
+#define PBR_BACKGROUND_COLOR PBR_COLOR_SKYBLUE
 
 ///////////////////////////////////////////////////////////////////////////////
 // Output
@@ -40,7 +40,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Old
 
-#define PBR_NUM_SAMPLES 8
+#define PBR_NUM_SAMPLES 1
 #define PBR_ACTIVE_SAMPLER_CLASS UniformSampler
 #define PBR_DISCRETE_SAMPLER_DIFFUSE_OFFSET 50
 #define PBR_GRID_SAMPLER_SIZE 1
