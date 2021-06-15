@@ -12,12 +12,25 @@
 // Note that X cross Y = Z, making this a right-handed system
 
 Scene PBR_SCENE_RTWEEKEND = {
+    // Blue ball
+    Actor {
+        std::make_shared<Material>(
+            Colorf { 0.1, 0.1, 1.0 }, // Color
+            Colorf { 0.0, 0.0, 0.0 },  // Emission
+            new path::OrenNayar {0.5}
+        ),
+        SphereGeometry {
+            Vec { -1.8, 0.7, 2.0 },   // Position
+            0.5                      // Radius
+        }
+    },
+
     // Red ball
     Actor {
         std::make_shared<Material>(
             Colorf { 1.0, 0.1, 0.1 }, // Color
             Colorf { 0.0, 0.0, 0.0 },  // Emission
-            new path::DiffuseBRDF
+            new path::OrenNayar {0.5}
         ),
         SphereGeometry {
             Vec { 1.5, 1.0, 0.0 },   // Position
@@ -30,7 +43,7 @@ Scene PBR_SCENE_RTWEEKEND = {
         std::make_shared<Material>(
             Colorf { 1.0, 1.0, 1.0 }, // Color
             Colorf { 6.0, 6.0, 6.0 },  // Emission
-            new path::DiffuseBRDF
+            new path::OrenNayar {0.5}
         ),
         SphereGeometry {
             Vec { 6.0, 4.5, -4.0 },   // Position
@@ -43,7 +56,7 @@ Scene PBR_SCENE_RTWEEKEND = {
         std::make_shared<Material>(
             Colorf { 1.0, 1.0, 1.0 }, // Color
             Colorf { 6.0, 6.0, 6.0 },  // Emission
-            new path::DiffuseBRDF
+            new path::OrenNayar {0.5}
         ),
         SphereGeometry {
             Vec { -6.0, 4.5, -4.0 },   // Position
