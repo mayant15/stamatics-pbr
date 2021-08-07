@@ -16,8 +16,8 @@ By [@akshatsh49](https://github.com/akshatsh49)
 By [@deepalokkaushik](https://github.com/deepalokkaushik)
 ![deepalokkaushik](screenshots/showcase/deepalokkaushik.png)
 
-By [@Prajwal-Arya](https://github.com/Prajwal-Arya/)
-![Prajwal-Arya](screenshots/showcase/Prajwal-Arya.png)
+By [@Prajwal-Arya](https://github.com/Prajwal-Arya)
+![Prajwal-Arya](screenshots/showcase/prajwal-arya.png)
 
 By [@sps1112](https://github.com/sps1112)
 ![sps1112](screenshots/showcase/sps.png)
