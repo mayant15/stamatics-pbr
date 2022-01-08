@@ -34,8 +34,8 @@ namespace pbr
                 new DiffuseBRDF
             ),
             SphereGeometry {
-                Vec { 6.0, 4.5, -4.0 },   // Position
-                3.0                      // Radius
+                Vec { 6.0, 4.5, -8.0 },   // Position
+                2.0                      // Radius
             }
         },
 
@@ -47,8 +47,8 @@ namespace pbr
                 new DiffuseBRDF
             ),
             SphereGeometry {
-                Vec { -6.0, 4.5, -4.0 },   // Position
-                3.0                      // Radius
+                Vec { -6.0, 4.5, -8.0 },   // Position
+                2.0                      // Radius
             }
         },
 
