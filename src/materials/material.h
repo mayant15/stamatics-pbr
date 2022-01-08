@@ -22,6 +22,8 @@ namespace pbr
         virtual Ray sample(const Ray& in, const HitResult& hit) = 0;
         virtual Colorf eval(const Ray& in, const HitResult& hit, const Ray& out) = 0;
 
+        virtual ~BaseBRDF() = default;
+
     protected:
         UniformRNG rng;
         Basis get_basis(const HitResult& hit) const;
