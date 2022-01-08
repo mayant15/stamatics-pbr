@@ -1,9 +1,11 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.17)
 project(pbr)
 
 set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories(common src)
 
@@ -32,3 +34,7 @@ endif()
 
 # Other tools
 add_executable(sample2d tools/sampler/main.cpp common/stb_image_write.cpp)
+
+# Copy compile_commands.json to repo root
+configure_file(${CMAKE_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json COPYONLY)
+

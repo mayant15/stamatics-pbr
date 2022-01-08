@@ -1,4 +1,5 @@
 cmake-build-debug
+.cache
 .idea
 .vs
 .vscode
@@ -6,3 +7,6 @@ build
 *.txt
 !screenshots/*.png
 out.png
+
+compile_commands.json
+

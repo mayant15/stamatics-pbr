@@ -61,18 +61,18 @@ namespace pbr::dims
     using Volume = Dimensions<3, 0, 0, 0, 0, 0, 0>;
     using Speed = Dimensions<1, -1, 0, 0, 0, 0, 0>;
 
-    template <class T, class U>
+    template <typename T, typename U>
     constexpr bool assert_eq()
     {
-        return std::is_same<T::dimensions, U::dimensions>::value;
+        return std::is_same<typename T::dimensions, typename U::dimensions>::value;
     }
 
     template <class T, class U>
     constexpr bool decay_eq()
     {
         return std::is_same<
-            std::decay<T>::type::dimensions,
-            std::decay<U>::type::dimensions
+            typename std::decay<T>::type::dimensions,
+            typename std::decay<U>::type::dimensions
         >::value;
     };
 }
@@ -89,7 +89,7 @@ namespace pbr
         template <class OtherDims>
         decltype(auto) operator*(Number<OtherDims> other)
         {
-            return Number<dimensions::multiply<OtherDims>> { m_data * other.m_data };
+            return Number<typename dimensions::template multiply<OtherDims>> { m_data * other.m_data };
         }
 
         template <class OtherDims>
@@ -109,7 +109,7 @@ namespace pbr
         template <class OtherDims>
         decltype(auto) operator/(Number<OtherDims> other)
         {
-            return Number<dimensions::divide<OtherDims>> { m_data / other.m_data };
+            return Number<typename dimensions::template divide<OtherDims>> { m_data / other.m_data };
         }
 
         template <class OtherDims>
