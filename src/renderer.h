@@ -46,14 +46,14 @@ namespace pbr
 
             UniformRNG rng;
 
+            int progress = 0;
+
             // Iterate over all rows
 #if PBR_USE_THREADS
-#pragma omp parallel for private(rng)
+#pragma omp parallel for private(rng) shared(progress)
 #endif
             for (int row = 0; row < outImage.rows(); ++row)
             {
-
-                LOG_DEBUG("Row %d", row);
 
                 // Iterate over all cols
                 for (int col = 0; col < outImage.cols(); ++col)
@@ -87,6 +87,10 @@ namespace pbr
 
                     outImage[row * PBR_OUTPUT_IMAGE_COLUMNS + col] = to_colori(color);
                 }
+
+                // Not adding a critical section here, accurate progress reporting is not super important
+                progress++;
+                LOG_DEBUG("Rendering %f%%", progress * 100 / (double) outImage.rows());
             }
         }
 
