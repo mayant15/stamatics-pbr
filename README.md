@@ -1,6 +1,6 @@
 # Physically-Based Rendering
 
-A short course on pathtracing for Stamatics Projects '21.
+A short course on pathtracing for [Stamatics Projects '21](https://stamatics.github.io/projects-2021/physically-based-rendering).
 
 ## Structure
 
